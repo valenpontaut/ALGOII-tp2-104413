@@ -1,11 +1,11 @@
 #include "pokemon.h"
-#include "tipo.h"
 #include "ataque.h"
+#include "tipo.h"
+#include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <stdbool.h>
 
 #define CANT_ATAQUES 3
 #define MAX_CARACTERES 20
@@ -60,65 +60,79 @@ bool es_numero_ui(char *poder)
 informacion_pokemon_t *ordenar_ip(informacion_pokemon_t *ip)
 {
 	int poke_total = ip->cant_poke;
-        if(poke_total >= 2){
-                int poke_i;
-                int poke_j;
-                pokemon_t aux_poke;
-                for (poke_i = 1; poke_i < poke_total; poke_i++) {
-                        aux_poke = ip->pokemones[poke_i];
-                        poke_j = poke_i - 1;
-                        while (poke_j >= 0 &&
-                        strcmp(aux_poke.nombre, ip->pokemones[poke_j].nombre) < 0) {
-                                ip->pokemones[poke_j + 1] = ip->pokemones[poke_j];
-                                poke_j--;
-                        }
-                        ip->pokemones[poke_j + 1] = aux_poke;
-                }       
-        }
+	if (poke_total >= 2) {
+		int poke_i;
+		int poke_j;
+		pokemon_t aux_poke;
+		for (poke_i = 1; poke_i < poke_total; poke_i++) {
+			aux_poke = ip->pokemones[poke_i];
+			poke_j = poke_i - 1;
+			while (poke_j >= 0 &&
+			       strcmp(aux_poke.nombre,
+				      ip->pokemones[poke_j].nombre) < 0) {
+				ip->pokemones[poke_j + 1] =
+					ip->pokemones[poke_j];
+				poke_j--;
+			}
+			ip->pokemones[poke_j + 1] = aux_poke;
+		}
+	}
 	return ip;
 }
 
-bool guardar_pokemon_valido(informacion_pokemon_t *info_poke, pokemon_t nuevo_pokemon){
-        pokemon_t *aux_pokemones = (pokemon_t *)realloc(info_poke->pokemones,(long unsigned int)(info_poke->cant_poke + 1) * sizeof(pokemon_t));
-        if (aux_pokemones == NULL) {
-                return false;
-        }
-        info_poke->pokemones = aux_pokemones;
-        info_poke->pokemones[info_poke->cant_poke] = nuevo_pokemon;
-        info_poke->cant_poke++;
-        return true;
+bool guardar_pokemon_valido(informacion_pokemon_t *info_poke,
+			    pokemon_t nuevo_pokemon)
+{
+	pokemon_t *aux_pokemones = (pokemon_t *)realloc(
+		info_poke->pokemones,
+		(long unsigned int)(info_poke->cant_poke + 1) *
+			sizeof(pokemon_t));
+	if (aux_pokemones == NULL) {
+		return false;
+	}
+	info_poke->pokemones = aux_pokemones;
+	info_poke->pokemones[info_poke->cant_poke] = nuevo_pokemon;
+	info_poke->cant_poke++;
+	return true;
 }
 
 bool leer_archivo(FILE *archivo, informacion_pokemon_t *info_poke)
 {
-        char nombre[MAX_CARACTERES];
-        char tipo[MAX_CARACTERES];
-        char poder[MAX_CARACTERES];
+	char nombre[MAX_CARACTERES];
+	char tipo[MAX_CARACTERES];
+	char poder[MAX_CARACTERES];
 	char linea[MAX_CARACTERES_LINEA];
-        int cant_ataques = 0;
+	int cant_ataques = 0;
 	while (fgets(linea, sizeof(linea), archivo)) {
-                pokemon_t nuevo_pokemon;
-                int campos_leidos = sscanf(linea, SSCANF_LINEA, nombre, tipo, poder);
-                if (campos_leidos == 2 && cant_ataques == 0){
-                        strcpy(nuevo_pokemon.nombre, nombre);
-                        nuevo_pokemon.tipo = parsear_tipo(tipo);
-                        if (nuevo_pokemon.tipo == -1)
-                                break; // tipo de pokemon invalido
-                } else if ((campos_leidos == 3) && (cant_ataques <= CANT_ATAQUES)) {
-                        strcpy(nuevo_pokemon.ataques[cant_ataques - 1].nombre, nombre);
-                        nuevo_pokemon.ataques[cant_ataques - 1].tipo = parsear_tipo(tipo);
-                        if (nuevo_pokemon.ataques[cant_ataques - 1].tipo == -1)
-                                break; // tipo de ataque invalido
-                        if (!es_numero_ui(poder))
-                                break; // poder de ataque invalido
-                        nuevo_pokemon.ataques[cant_ataques - 1].poder = (unsigned int)atoi(poder);
-                        if (cant_ataques == CANT_ATAQUES)
-                                if(!guardar_pokemon_valido(info_poke, nuevo_pokemon)) break;
-                } else {
-                        break;
-                }
-                cant_ataques = (cant_ataques + 1) % (CANT_ATAQUES + 1);
-        }
+		pokemon_t nuevo_pokemon;
+		int campos_leidos =
+			sscanf(linea, SSCANF_LINEA, nombre, tipo, poder);
+		if (campos_leidos == 2 && cant_ataques == 0) {
+			strcpy(nuevo_pokemon.nombre, nombre);
+			nuevo_pokemon.tipo = parsear_tipo(tipo);
+			if (nuevo_pokemon.tipo == -1)
+				break; // tipo de pokemon invalido
+		} else if ((campos_leidos == 3) &&
+			   (cant_ataques <= CANT_ATAQUES)) {
+			strcpy(nuevo_pokemon.ataques[cant_ataques - 1].nombre,
+			       nombre);
+			nuevo_pokemon.ataques[cant_ataques - 1].tipo =
+				parsear_tipo(tipo);
+			if (nuevo_pokemon.ataques[cant_ataques - 1].tipo == -1)
+				break; // tipo de ataque invalido
+			if (!es_numero_ui(poder))
+				break; // poder de ataque invalido
+			nuevo_pokemon.ataques[cant_ataques - 1].poder =
+				(unsigned int)atoi(poder);
+			if (cant_ataques == CANT_ATAQUES)
+				if (!guardar_pokemon_valido(info_poke,
+							    nuevo_pokemon))
+					break;
+		} else {
+			break;
+		}
+		cant_ataques = (cant_ataques + 1) % (CANT_ATAQUES + 1);
+	}
 	if (info_poke->cant_poke == 0) {
 		return false; // No se puede cargar archivos sin pokemones validos
 	}
@@ -135,14 +149,14 @@ informacion_pokemon_t *pokemon_cargar_archivo(const char *path)
 		return NULL;
 	informacion_pokemon_t *info_poke = (informacion_pokemon_t *)calloc(
 		1, sizeof(informacion_pokemon_t));
-	if (info_poke == NULL){
+	if (info_poke == NULL) {
 		fclose(archivo);
 		return NULL;
-        }
+	}
 	if (!leer_archivo(archivo, info_poke)) {
 		fclose(archivo);
 		pokemon_destruir_todo(info_poke);
-		return NULL; //Si es un archivo invalido, retorna NULL
+		return NULL; // Si es un archivo invalido, retorna NULL
 	}
 	fclose(archivo);
 	return ordenar_ip(info_poke);

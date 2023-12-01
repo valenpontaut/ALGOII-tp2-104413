@@ -1,11 +1,11 @@
-#include "src/tipo.h"
-#include <stdio.h>
-#include <string.h>
-#include "src/pokemon.h"
+#include "pa2m.h"
 #include "src/ataque.h"
 #include "src/juego.h"
 #include "src/lista.h"
-#include "pa2m.h"
+#include "src/pokemon.h"
+#include "src/tipo.h"
+#include <stdio.h>
+#include <string.h>
 
 #define ARCHIVO_OK "ejemplos/correcto.txt"
 #define ARCHIVO_CORTO "ejemplos/corto.txt"
@@ -39,7 +39,8 @@ void cargar_archivo()
 		     "El listado de pokemones es vacío");
 	pa2m_afirmar(
 		juego_cargar_pokemon(j, ARCHIVO_CORTO) == POKEMON_INSUFICIENTES,
-		"Cargar un archivo con menos pokemon que los necesarios resulta en ERROR_GENERAL");
+		"Cargar un archivo con menos pokemon que los necesarios resulta "
+		"en ERROR_GENERAL");
 	pa2m_afirmar(lista_tamanio(juego_listar_pokemon(j)) == 0,
 		     "El listado de pokemones es vacío");
 	pa2m_afirmar(juego_cargar_pokemon(j, ARCHIVO_OK) == TODO_OK,
@@ -115,11 +116,13 @@ void jugar()
 	pa2m_afirmar(
 		(obtenido = juego_jugar_turno(j, invalida1, validaj21))
 				.jugador1 == ATAQUE_ERROR,
-		"Realizar una jugada inválida con el primer jugador devuelve ATAQUE_ERROR para el jugador");
+		"Realizar una jugada inválida con el primer jugador devuelve "
+		"ATAQUE_ERROR para el jugador");
 	pa2m_afirmar(
 		(obtenido = juego_jugar_turno(j, validaj11, invalida2))
 				.jugador2 == ATAQUE_ERROR,
-		"Realizar una jugada inválida con el segundo jugador devuelve ATAQUE_ERROR para el segundo jugador");
+		"Realizar una jugada inválida con el segundo jugador devuelve "
+		"ATAQUE_ERROR para el segundo jugador");
 	pa2m_afirmar(
 		(obtenido = juego_jugar_turno(j, validaj11, validaj21))
 					.jugador1 == ATAQUE_REGULAR &&
@@ -138,10 +141,12 @@ void jugar()
 	pa2m_afirmar(
 		(obtenido = juego_jugar_turno(j, validaj12, validaj22))
 				.jugador1 == ATAQUE_EFECTIVO,
-		"Realizar una jugada valida de tipo ELECTRICO contra un pokemon AGUA resulta en ataque efectivo");
+		"Realizar una jugada valida de tipo ELECTRICO contra un pokemon AGUA "
+		"resulta en ataque efectivo");
 	pa2m_afirmar(
 		obtenido.jugador2 == ATAQUE_INEFECTIVO,
-		"Realizar una jugada valida de tipo AGUA contra un pokemon ELECTRICO resulta en ataque inefectivo");
+		"Realizar una jugada valida de tipo AGUA contra un pokemon "
+		"ELECTRICO resulta en ataque inefectivo");
 
 	pa2m_afirmar(juego_obtener_puntaje(j, JUGADOR1) == 4,
 		     "El puntaje del jugador 1 es 4 (1 + 1*3)");
@@ -155,10 +160,12 @@ void jugar()
 	pa2m_afirmar(
 		(obtenido = juego_jugar_turno(j, validaj13, validaj23))
 				.jugador1 == ATAQUE_EFECTIVO,
-		"Realizar una jugada valida de tipo FUEGO contra un pokemon PLANTA resulta en ataque efectivo");
+		"Realizar una jugada valida de tipo FUEGO contra un pokemon PLANTA "
+		"resulta en ataque efectivo");
 	pa2m_afirmar(
 		obtenido.jugador2 == ATAQUE_INEFECTIVO,
-		"Realizar una jugada valida de tipo PLANTA contra un pokemon FUEGO resulta en ataque inefectivo");
+		"Realizar una jugada valida de tipo PLANTA contra un pokemon "
+		"FUEGO resulta en ataque inefectivo");
 
 	pa2m_afirmar(juego_obtener_puntaje(j, JUGADOR1) == 16,
 		     "El puntaje del jugador 1 es 16 (4 + 4*3)");

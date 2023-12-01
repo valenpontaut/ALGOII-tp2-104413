@@ -1,6 +1,6 @@
-#include "lista.h"
-#include "juego.h"
 #include "adversario.h"
+#include "juego.h"
+#include "lista.h"
 #include "pokemon.h"
 
 adversario_t *adversario_crear(lista_t *pokemon)
