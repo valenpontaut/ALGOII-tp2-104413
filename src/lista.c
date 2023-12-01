@@ -1,7 +1,7 @@
 #include "lista.h"
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct nodo {
 	void *elemento;
@@ -11,7 +11,7 @@ typedef struct nodo {
 struct lista {
 	nodo_t *nodo_inicio;
 	nodo_t *nodo_final;
-        size_t cant_elem;
+	size_t cant_elem;
 };
 
 struct lista_iterador {
@@ -48,7 +48,7 @@ lista_t *lista_insertar(lista_t *lista, void *elemento)
 		aux->siguiente = nodo_nuevo;
 		lista->nodo_final = nodo_nuevo;
 	}
-        lista->cant_elem++;
+	lista->cant_elem++;
 	return lista;
 }
 
@@ -58,28 +58,28 @@ lista_t *lista_insertar_en_posicion(lista_t *lista, void *elemento,
 	if (!lista) {
 		return NULL;
 	}
-        if(posicion >= lista->cant_elem || lista_vacia(lista)){
-                lista_insertar(lista, elemento);
-        } else {
-	        nodo_t *nodo_nuevo = crear_nodo(elemento);
-                if (nodo_nuevo == NULL)
-                        return NULL;
+	if (posicion >= lista->cant_elem || lista_vacia(lista)) {
+		lista_insertar(lista, elemento);
+	} else {
+		nodo_t *nodo_nuevo = crear_nodo(elemento);
+		if (nodo_nuevo == NULL)
+			return NULL;
 		nodo_t *aux = lista->nodo_inicio;
-                if (posicion == 0) {
-                        nodo_nuevo->siguiente = aux;
-                        lista->nodo_inicio = nodo_nuevo;
-                } else {
-                        size_t i = 0;
-                        while (aux->siguiente != NULL && i < posicion - 1) {
-                                aux = aux->siguiente;
-                                i++;
-                        }
-                        nodo_nuevo->siguiente = aux->siguiente;
-                        aux->siguiente = nodo_nuevo;
-                }
+		if (posicion == 0) {
+			nodo_nuevo->siguiente = aux;
+			lista->nodo_inicio = nodo_nuevo;
+		} else {
+			size_t i = 0;
+			while (aux->siguiente != NULL && i < posicion - 1) {
+				aux = aux->siguiente;
+				i++;
+			}
+			nodo_nuevo->siguiente = aux->siguiente;
+			aux->siguiente = nodo_nuevo;
+		}
 		if (nodo_nuevo->siguiente == NULL)
 			lista->nodo_final = nodo_nuevo;
-                lista->cant_elem++;
+		lista->cant_elem++;
 	}
 	return lista;
 }
@@ -102,7 +102,7 @@ void *lista_quitar(lista_t *lista)
 		lista->nodo_final = aux;
 	}
 	free(nodo_removido);
-        lista->cant_elem--;
+	lista->cant_elem--;
 	return elemento_removido;
 }
 
@@ -118,7 +118,7 @@ void *lista_quitar_de_posicion(lista_t *lista, size_t posicion)
 		if (lista->nodo_inicio == NULL)
 			lista->nodo_final = NULL;
 		free(nodo_removido);
-                lista->cant_elem--;
+		lista->cant_elem--;
 		return elemento_removido;
 	} else {
 		nodo_t *nodo_anterior = NULL;
@@ -140,7 +140,7 @@ void *lista_quitar_de_posicion(lista_t *lista, size_t posicion)
 		nodo_t *nodo_removido = nodo_actual;
 		void *elemento_removido = nodo_actual->elemento;
 		free(nodo_removido);
-                lista->cant_elem--;
+		lista->cant_elem--;
 		return elemento_removido;
 	}
 }
