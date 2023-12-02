@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define CANT_MIN_POKEMONES 4
 #define CANT_POKES_JUGADOR 3
@@ -36,10 +37,10 @@ JUEGO_ESTADO juego_cargar_pokemon(juego_t *juego, char *archivo)
 {
 	informacion_pokemon_t *pokemones_cargados =
 		pokemon_cargar_archivo(archivo);
-	if (!pokemones_cargados) {
+	if (!pokemones_cargados)
 		return ERROR_GENERAL;
-	} else if (pokemon_cantidad(pokemones_cargados) < CANT_MIN_POKEMONES) {
-		juego_destruir(juego);
+	if (pokemon_cantidad(pokemones_cargados) < CANT_MIN_POKEMONES) {
+		pokemon_destruir_todo(pokemones_cargados);
 		return POKEMON_INSUFICIENTES;
 	}
 	juego->pokemones = pokemones_cargados;
@@ -58,6 +59,7 @@ lista_t *juego_listar_pokemon(juego_t *juego)
 	lista_t *lista_pokemones = lista_crear();
 	if (!lista_pokemones)
 		return NULL;
+	juego->lista_pokemones = lista_pokemones;
 	int cant_pokemones = pokemon_cantidad(juego->pokemones);
 	int cant_leida = con_cada_pokemon(juego->pokemones, listar_pokemon,
 					  lista_pokemones);
@@ -243,7 +245,7 @@ resultado_jugada_t desarrollar_turno(const ataque_t *ataque1,
 	// Controlo finalizacion de juego:
 	if (lista_vacia(juego->jugador1->ataques_sin_utilizar) ||
 	    lista_vacia(juego->jugador2->ataques_sin_utilizar))
-		juego->finalizado = false;
+		juego->finalizado = true;
 	return resultado;
 }
 
@@ -275,9 +277,9 @@ resultado_jugada_t juego_jugar_turno(juego_t *juego, jugada_t jugada_jugador1,
 	if (!lista_buscar_elemento(juego->jugador1->ataques_sin_utilizar,
 				   buscar_ataque, jugada_jugador1.ataque) ||
 	    !lista_buscar_elemento(juego->jugador2->ataques_sin_utilizar,
-				   buscar_ataque, jugada_jugador2.ataque)) {
+				   buscar_ataque, jugada_jugador2.ataque))
 		return resultado;
-	}
+
 	return desarrollar_turno(ataque1, ataque2, pokemon1, pokemon2, juego);
 }
 
@@ -285,7 +287,7 @@ int juego_obtener_puntaje(juego_t *juego, JUGADOR jugador)
 {
 	if (!juego)
 		return 0;
-	if (jugador == JUGADOR1 && juego->jugador1) { // linea 306
+	if (jugador == JUGADOR1 && juego->jugador1) {
 		return juego->jugador1->puntos;
 	} else if (jugador == JUGADOR2 && juego->jugador2) {
 		return juego->jugador2->puntos;
