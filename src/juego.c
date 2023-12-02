@@ -70,16 +70,30 @@ lista_t *juego_listar_pokemon(juego_t *juego)
 	return lista_pokemones;
 }
 
-lista_t *insertar_pokemones_jugador(jugador_t *jugador, pokemon_t *pokemon1,
-				    pokemon_t *pokemon2, pokemon_t *pokemon3)
+bool insertar_pokemones_jugador(juego_t *juego, JUGADOR jugador_actual,
+				pokemon_t *pokemon1, pokemon_t *pokemon2,
+				pokemon_t *pokemon3)
 {
-	lista_t *pokemones = lista_crear();
-	if (!pokemones)
-		return NULL;
-	pokemones = lista_insertar(pokemones, pokemon1);
-	pokemones = lista_insertar(pokemones, pokemon2);
-	pokemones = lista_insertar(pokemones, pokemon3);
-	return pokemones;
+	lista_t *poke1;
+	lista_t *poke2;
+	lista_t *poke3;
+	// EL tercer pokemon se asigna al adversario
+	if (jugador_actual == JUGADOR1) {
+		poke1 = lista_insertar(juego->jugador1->pokemones, pokemon1);
+		poke2 = lista_insertar(juego->jugador1->pokemones, pokemon2);
+		poke3 = lista_insertar(juego->jugador2->pokemones, pokemon3);
+		if (!poke1 || !poke2 || !poke3)
+			return false;
+		return true;
+	} else if (jugador_actual == JUGADOR2) {
+		poke1 = lista_insertar(juego->jugador2->pokemones, pokemon1);
+		poke2 = lista_insertar(juego->jugador2->pokemones, pokemon2);
+		poke3 = lista_insertar(juego->jugador1->pokemones, pokemon3);
+		if (!poke1 || !poke2 || !poke3)
+			return false;
+		return true;
+	}
+	return false;
 }
 
 void insertar_ataque(const ataque_t *ataque, void *lista_ataques)
@@ -87,15 +101,73 @@ void insertar_ataque(const ataque_t *ataque, void *lista_ataques)
 	lista_insertar(lista_ataques, (ataque_t *)ataque);
 }
 
-lista_t *insertar_ataques_sin_utilizar(jugador_t *jugador)
+bool insertar_ataques_sin_utilizar(juego_t *juego, JUGADOR jugador_actual,
+				   pokemon_t *pokemon1, pokemon_t *pokemon2,
+				   pokemon_t *pokemon3)
 {
-	lista_t *ataques = lista_crear();
-	for (size_t pos = 0; pos < CANT_POKES_JUGADOR; pos++) {
-		pokemon_t *pokemon_actual =
-			lista_elemento_en_posicion(jugador->pokemones, pos);
-		con_cada_ataque(pokemon_actual, insertar_ataque, ataques);
+	int cant_ataques = 0;
+	if (jugador_actual == JUGADOR1) {
+		cant_ataques +=
+			con_cada_ataque(pokemon1, insertar_ataque,
+					juego->jugador1->ataques_sin_utilizar);
+		cant_ataques +=
+			con_cada_ataque(pokemon2, insertar_ataque,
+					juego->jugador1->ataques_sin_utilizar);
+		cant_ataques +=
+			con_cada_ataque(pokemon3, insertar_ataque,
+					juego->jugador2->ataques_sin_utilizar);
+		if (cant_ataques != 9)
+			return false;
+		return true;
+	} else if (jugador_actual == JUGADOR2) {
+		cant_ataques +=
+			con_cada_ataque(pokemon1, insertar_ataque,
+					juego->jugador2->ataques_sin_utilizar);
+		cant_ataques +=
+			con_cada_ataque(pokemon2, insertar_ataque,
+					juego->jugador2->ataques_sin_utilizar);
+		cant_ataques +=
+			con_cada_ataque(pokemon3, insertar_ataque,
+					juego->jugador1->ataques_sin_utilizar);
+		if (cant_ataques != 9)
+			return false;
+		return true;
 	}
-	return ataques;
+	return false;
+}
+
+bool reservar_memoria_jugadores(juego_t *juego)
+{
+	// Reserva memoria dinamica para cada jugador por unica vez en el juego y crea sus respectivas listas de pokemones y ataques sin utilizar
+	if (!juego->jugador1) {
+		jugador_t *jugador1 = (jugador_t *)calloc(1, sizeof(jugador_t));
+		if (!jugador1)
+			return false;
+		juego->jugador1 = jugador1;
+		lista_t *pokemones1 = lista_crear();
+		if (!pokemones1)
+			return false;
+		juego->jugador1->pokemones = pokemones1;
+		lista_t *ataques1 = lista_crear();
+		if (!ataques1)
+			return false;
+		juego->jugador1->ataques_sin_utilizar = ataques1;
+	}
+	if (!juego->jugador2) {
+		jugador_t *jugador2 = (jugador_t *)calloc(1, sizeof(jugador_t));
+		if (!jugador2)
+			return false;
+		juego->jugador2 = jugador2;
+		lista_t *pokemones2 = lista_crear();
+		if (!pokemones2)
+			return false;
+		juego->jugador2->pokemones = pokemones2;
+		lista_t *ataques2 = lista_crear();
+		if (!ataques2)
+			return false;
+		juego->jugador2->ataques_sin_utilizar = ataques2;
+	}
+	return true;
 }
 
 JUEGO_ESTADO juego_seleccionar_pokemon(juego_t *juego, JUGADOR jugador,
@@ -114,25 +186,17 @@ JUEGO_ESTADO juego_seleccionar_pokemon(juego_t *juego, JUGADOR jugador,
 	pokemon_t *pokemon3 = pokemon_buscar(juego->pokemones, nombre3);
 	if (!pokemon1 || !pokemon2 || !pokemon3)
 		return POKEMON_INEXISTENTE;
-
-	jugador_t *jugador_actual = (jugador_t *)calloc(1, sizeof(jugador_t));
-	// Lista de pokemones seleccionados para el jugador:
-	lista_t *pokemones = insertar_pokemones_jugador(
-		jugador_actual, pokemon1, pokemon2, pokemon3);
-	if (!pokemones)
+	// Reservo memoria para cada jugador y sus respectivas listas de pokemones, si es que no fue hehco anteriormente
+	if (!reservar_memoria_jugadores(juego))
 		return ERROR_GENERAL;
-	jugador_actual->pokemones = pokemones;
+	// Lista los pokemones seleccionados a cada jugador:
+	if (!insertar_pokemones_jugador(juego, jugador, pokemon1, pokemon2,
+					pokemon3))
+		return ERROR_GENERAL;
 	// Lista de ataques a utilizar:
-	lista_t *ataques = insertar_ataques_sin_utilizar(jugador_actual);
-	if (!ataques)
+	if (!insertar_ataques_sin_utilizar(juego, jugador, pokemon1, pokemon2,
+					   pokemon3))
 		return ERROR_GENERAL;
-	jugador_actual->ataques_sin_utilizar = ataques;
-
-	if (jugador == JUGADOR1) {
-		juego->jugador1 = jugador_actual;
-	} else {
-		juego->jugador2 = jugador_actual;
-	}
 	return TODO_OK;
 }
 
@@ -218,7 +282,7 @@ int calcular_poder_ataque(RESULTADO_ATAQUE resultado, const ataque_t *ataque)
 
 int buscar_pokemon(void *pokemon, void *nombre)
 {
-	return (strcmp(pokemon_nombre(pokemon), nombre));
+	return (strcmp(pokemon_nombre(pokemon), (char *)nombre));
 }
 
 int buscar_ataque(void *ataque, void *nombre)
@@ -264,21 +328,24 @@ resultado_jugada_t juego_jugar_turno(juego_t *juego, jugada_t jugada_jugador1,
 	pokemon_t *pokemon2 = lista_buscar_elemento(juego->jugador2->pokemones,
 						    buscar_pokemon,
 						    jugada_jugador2.pokemon);
-	if (!pokemon1 || !pokemon2)
+	if (!pokemon1 || !pokemon2) {
 		return resultado;
+	}
 	// No existen los ataques:
 	const ataque_t *ataque1 =
 		pokemon_buscar_ataque(pokemon1, jugada_jugador1.ataque);
 	const ataque_t *ataque2 =
 		pokemon_buscar_ataque(pokemon2, jugada_jugador2.ataque);
-	if (!ataque1 || !ataque2)
+	if (!ataque1 || !ataque2) {
 		return resultado;
+	}
 	// Los ataques ya fueron utilizados:
 	if (!lista_buscar_elemento(juego->jugador1->ataques_sin_utilizar,
 				   buscar_ataque, jugada_jugador1.ataque) ||
 	    !lista_buscar_elemento(juego->jugador2->ataques_sin_utilizar,
-				   buscar_ataque, jugada_jugador2.ataque))
+				   buscar_ataque, jugada_jugador2.ataque)) {
 		return resultado;
+	}
 
 	return desarrollar_turno(ataque1, ataque2, pokemon1, pokemon2, juego);
 }
