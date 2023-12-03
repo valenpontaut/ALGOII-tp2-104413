@@ -185,6 +185,13 @@ jugada_t jugador_pedir_nombre_y_ataque()
 	return jugada;
 }
 
+void imprimir_jugada(jugada_t j)
+{
+	printf("\n¡Tu oponente ha atacado!\n\n");
+	printf("Pokemón utilizado: %s\n", j.pokemon);
+	printf("Ataque utilizado: %s\n\n", j.ataque);
+}
+
 int main(int argc, char *argv[])
 {
 	juego_t *juego = juego_crear();
@@ -250,7 +257,6 @@ int main(int argc, char *argv[])
 	char *p_nombre_adversario1 = nombre_adversario1;
 	char *p_nombre_adversario2 = nombre_adversario2;
 	char *p_nombre_adversario3 = nombre_adversario3;
-
 	if (!adversario_seleccionar_pokemon(adversario, &p_nombre_adversario1,
 					    &p_nombre_adversario2,
 					    &p_nombre_adversario3)) {
@@ -301,6 +307,7 @@ int main(int argc, char *argv[])
 		// Jugada del jugador
 		printf("Seleccione el pokemon y ataque que quiera usar para este turno (recuerde que no puede repetir ataque)\n");
 		jugada_t jugada_jugador1 = jugador_pedir_nombre_y_ataque();
+		adversario_informar_jugada(adversario, jugada_jugador1);
 		// Jugada del adversario
 		jugada_t jugada_jugador2 =
 			adversario_proxima_jugada(adversario);
@@ -314,11 +321,11 @@ int main(int argc, char *argv[])
 				juego, jugada_jugador1, jugada_jugador2);
 		}
 		printf("\n//////////////////////////////////////////////////////////////\n=============== INFORMACIÓN PARA EL ADVERSARIO ===============\n");
-		adversario_informar_jugada(adversario, jugada_jugador1);
+		imprimir_jugada(jugada_jugador1);
 		printf("==============================================================\n//////////////////////////////////////////////////////////////\n");
 
 		printf("\n//////////////////////////////////////////////////////////////\n================= INFORMACIÓN PARA EL JUGADOR ================\n");
-		adversario_informar_jugada(adversario, jugada_jugador2);
+		imprimir_jugada(jugada_jugador2);
 		printf("==============================================================\n//////////////////////////////////////////////////////////////\n");
 
 		printf("\n=> RESULTADO DE LA PARTIDA\n");
