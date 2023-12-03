@@ -4,17 +4,22 @@
 #include <stdio.h>
 
 typedef struct _menu_t menu_t;
+typedef struct comando comando_t;
 
 /**** Se crea el TDA menu reutilizando las funciones del TDA HASH ****/
 
-menu_t *crear_menu(size_t capacidad);
+menu_t *crear_menu();
 
-menu_t *insertar_comando(menu_t *menu, const char *clave, void *elemento,
-			 void **anterior);
+comando_t *crear_comando(const char *descripcion, void (*accion)(void *),
+			 void *aux);
+
+menu_t *insertar_comando(menu_t *menu, const char *clave, void *elemento);
 
 bool contiene_comando(menu_t *menu, const char *clave);
 
-void *obtener_comando(menu_t *menu, const char *clave);
+comando_t *obtener_comando(menu_t *menu, const char *clave);
+
+bool ejecutar_comando(comando_t *comando);
 
 void imprimir_menu(menu_t *menu);
 
