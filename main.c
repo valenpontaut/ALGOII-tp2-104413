@@ -372,6 +372,19 @@ int main(int argc, char *argv[])
 		if (strcmp(menu_seleccion, "7") == 0)
 			break;
 	}
+
+	if (juego_finalizado(juego)) {
+		if (juego_obtener_puntaje(juego, JUGADOR1) >
+		    juego_obtener_puntaje(juego, JUGADOR2)) {
+			printf("\n¡FELICITACIONES! Ganaste (ﾉ◕ヮ◕)ﾉ*:・ﾟ✧\n");
+		} else if (juego_obtener_puntaje(juego, JUGADOR1) <
+			   juego_obtener_puntaje(juego, JUGADOR2)) {
+			printf("\nHas perdido (╥﹏╥)\n");
+		} else {
+			printf("\nEmpataron ¯\\_(ツ)_/¯\n");
+		}
+	}
+
 	printf("\n¡Gracias por participar!\n\n");
 	destruir_todo(juego, menu, pokemones_jugador, pokemones_adversario,
 		      adversario);
