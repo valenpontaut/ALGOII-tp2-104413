@@ -6,9 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define POKEMON_1 0
-#define POKEMON_2 1
-#define POKEMON_3 2
+#include <time.h> 
 
 typedef struct ataque ataque_t;
 
@@ -50,13 +48,27 @@ bool adversario_seleccionar_pokemon(adversario_t *adversario, char **nombre1,
 {
 	if (!adversario || !adversario->pokemones_listado)
 		return false;
-	// Selecciona los primeros 3 pokemones de la lista (asumo que no estan repetidos)
+	// Selecciona 3 pokemones random de la lista (asumo que no estan repetidos)
+        size_t total_pokemones = lista_tamanio(adversario->pokemones_listado);
+        size_t pos1;
+        size_t pos2;
+        size_t pos3;
+        srand((unsigned int)time(NULL));
+        do {
+                pos1 = (size_t)rand() % total_pokemones;
+        } while (pos1 >= total_pokemones);
+        do {
+                pos2 = (size_t)rand() % total_pokemones;
+        } while (pos2 == pos1 || pos2 >= total_pokemones);
+        do {
+                pos3 = (size_t)rand() % total_pokemones;
+        } while (pos3 == pos1 || pos3 == pos2 || pos3 >= total_pokemones);
 	pokemon_t *pokemon1 = (pokemon_t *)lista_elemento_en_posicion(
-		adversario->pokemones_listado, POKEMON_1);
+		adversario->pokemones_listado, pos1);
 	pokemon_t *pokemon2 = (pokemon_t *)lista_elemento_en_posicion(
-		adversario->pokemones_listado, POKEMON_2);
+		adversario->pokemones_listado, pos2);
 	pokemon_t *pokemon3 = (pokemon_t *)lista_elemento_en_posicion(
-		adversario->pokemones_listado, POKEMON_3);
+		adversario->pokemones_listado, pos3);
 	if (!pokemon1 || !pokemon2 || !pokemon3)
 		return false;
 	const char *nombre_poke1 = pokemon_nombre(pokemon1);
