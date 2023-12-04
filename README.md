@@ -120,6 +120,12 @@ Para empezar, se implementó un TDA Juego que reutiliza las implementaciones del
         <img width="55%" src="img/memory_allocation/tda_juego.png">
 </div>
 
+La complejidad de sus operaciones se detalla en la siguiente tabla:
+
+<div align="center">
+        <img width="70%" src="img/complejidad/complejidad_juego.png">
+</div>
+
 ### TDA Adversario
 
 Para el desarrollo del juego se precisó crear un TDA Adversario para simular lo mejor posible una interacción entre dos jugadores. Este selecciona los pokemones que va a utilizar en el juego contra el jugador, toma decisiones de ataque y simula como sería jugar con otro participante del que no sabríamos "como piensa". A continuación muestro el diagrama de alocación de memoria del adversario. 
@@ -130,6 +136,12 @@ Para el desarrollo del juego se precisó crear un TDA Adversario para simular lo
 
 **NOTA:** No desarrollo las estructuras lista_t, pokemon_t, ataque_t porque fueron mostradas en diagramas anteriores
 
+La complejidad de sus operaciones se detalla en la siguiente tabla:
+
+<div align="center">
+        <img width="70%" src="img/complejidad/complejidad_adversario.png">
+</div>
+
 ### TDA Menú
 
 Se implementó un TDA Menú para hacer más rápida la búsqueda de comandos a la hora de interactuar con el menú del juego. Para ello se reutilizaron las implementaciones del TDA Hash desarrolladas en TP anteriores a éste. Los valores de las claves esta vez fueron estructuras comando_t donde se guardaron la descripción del comando, la función que ejecuta ese comando y el elemento que precisa la función del comando para funcionar correctamente. Recordando lo que fue el uso de memoria dinámica del TDA Hash, acontinuación su diagrama de alocación de memoria junto al modificado para el TDA Menú:
@@ -139,5 +151,10 @@ Se implementó un TDA Menú para hacer más rápida la búsqueda de comandos a l
         <img width="45%" src="img/memory_allocation/tda_menu.png">
 </div>
 
+La complejidad de sus operaciones se detalla en la siguiente tabla:
+
+<div align="center">
+        <img width="70%" src="img/complejidad/complejidad_menu.png">
+</div>
 
 
